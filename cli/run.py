@@ -6,10 +6,10 @@ import os
 
 def launch():
     backend_dir = os.path.abspath(
-        os.path.join(os.path.dirname(__file__), "../services/backend")
+        os.path.join(os.path.dirname(__file__), "../backend")
     )
     frontend_dir = os.path.abspath(
-        os.path.join(os.path.dirname(__file__), "../services/frontend")
+        os.path.join(os.path.dirname(__file__), "../frontend")
     )
 
     if os.name == "nt":  # Windows
@@ -17,8 +17,8 @@ def launch():
     else:  # Unix/Linux/Mac
         npm_cmd = "npm"
 
-    # Start Flask backend
-    backend_proc = subprocess.Popen([sys.executable, "-m", "flask", "run"], cwd=backend_dir)
+    # Start FastAPI backend
+    backend_proc = subprocess.Popen([sys.executable, "src/main.py"], cwd=backend_dir)
 
     # Start Vite frontend
     frontend_proc = subprocess.Popen([npm_cmd, "run", "dev", "--", "-l", "silent"], cwd=frontend_dir)

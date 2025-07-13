@@ -8,6 +8,13 @@
 - **Document Management**: Allows for adding and managing documents in the vector database.
 - **Vector Database**: [ ! ] Currently working on implementing Postgres pgvector support.
 
+# To-Do
+- [x] Implement Ollama language model support.
+- [x] Implement simple query interface.
+- [ ] Implement simple vector database interface.
+- [ ] Implement simple document upload interface.
+- [ ] Implement simple document management.
+- [ ] Implement Postgres pgvector support.
 
 ## 🚀 Quickstart
 
@@ -25,11 +32,11 @@
 **Install duo server dependencies**  
   ```bash
   # Backend
-  cd avsrag/services/backend
+  cd ./backend
   pip install .
 
   # Frontend
-  cd avsrag/services/frontend
+  cd ./frontend
   npm install
   ```
 
