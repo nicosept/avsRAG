@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
 from rag import query_ollama
+import json
 
 load_dotenv()
 PORT = int(os.environ.get("PORT", 5000))
@@ -32,11 +33,17 @@ async def prompt(prompt: str):
 @app.websocket("/ws/prompt")
 async def websocket_prompt(websocket: WebSocket):
     await websocket.accept()
+    print("WebSocket connection established")
     try:
         while True:
             data = await websocket.receive_text()
+            try:
+              data = json.loads(data)
+            except json.JSONDecodeError:
+              data = [data]
             for chunk in query_ollama("gemma3:4b", data, stream=True):
                 await websocket.send_text(chunk)
+            await websocket.send_text("__END__")
     except WebSocketDisconnect:
         print("WebSocket disconnected")
     except Exception as e:
