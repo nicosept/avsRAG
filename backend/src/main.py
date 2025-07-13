@@ -1,5 +1,5 @@
 import os
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, WebSocket, HTTPException, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
@@ -29,7 +29,19 @@ app.add_middleware(
 async def prompt(prompt: str):
     return {"message": query_ollama("gemma3:4b", prompt)}
 
+@app.websocket("/ws/prompt")
+async def websocket_prompt(websocket: WebSocket):
+    await websocket.accept()
+    try:
+        while True:
+            data = await websocket.receive_text()
+            for chunk in query_ollama("gemma3:4b", data, stream=True):
+                await websocket.send_text(chunk)
+    except WebSocketDisconnect:
+        print("WebSocket disconnected")
+    except Exception as e:
+        await websocket.close(code=1000, reason=str(e))
 if __name__ == "__main__":
     import uvicorn
     print(f"Running on port {PORT}, Vite on {VITE_PORT}")
-    uvicorn.run("main:app", port=PORT, host="127.0.0.1", reload=True)
+    uvicorn.run("main:app", port=PORT, host="127.0.0.1", reload=True, log_level="error")

@@ -10,21 +10,12 @@ def query_ollama(model: str, prompt: str, context: str = None, stream: bool = Fa
 
         if not stream:
             return response["message"]["content"]
+        
         for chunk in response:
-            print(chunk["message"]["content"], end="", flush=True)
+            yield chunk["message"]["content"]
 
     except ollama.ResponseError as e:
-        return f"Error querying Ollama: {str(e)}"
-
-
-def main():
-    model = "gemma3:4b"
-    prompt = "What is the capital of France?"
-    query_ollama(model, prompt)
-    context = "France is a country in Europe. Its capital is Paris."
-    print("\n\nWith context:")
-    query_ollama(model, prompt, context)
-
-
-if __name__ == "__main__":
-    main()
+        if not stream:
+            return f"Error querying Ollama: {e.message}"
+        else:
+            yield f"Error querying Ollama: {e.message}"

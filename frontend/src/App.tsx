@@ -17,6 +17,24 @@ function App() {
     }
   }
 
+  const wsPrompt = async () => {
+    if (prompt && prompt.trim() !== "") {
+      const ws = new WebSocket("ws://localhost:5000/ws/prompt");
+      ws.onopen = () => {
+        ws.send(prompt);
+      };
+      ws.onmessage = (event) => {
+        setData(prevData => prevData ? prevData + event.data : event.data);
+      };
+      ws.onclose = () => {
+        console.log("WebSocket connection closed");
+      };
+      return () => {
+        ws.close();
+      };
+    }
+  };
+
   return (
     <>
       <h1>ollama UI</h1>
@@ -30,7 +48,7 @@ function App() {
         value={prompt || ""}
         onChange={e => setPrompt(e.target.value)}
       />
-      <button onClick={() => fetchData()} disabled={!prompt}>
+      <button onClick={() => wsPrompt()} disabled={!prompt}>
         Ask
       </button>
     </>
