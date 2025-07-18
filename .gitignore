@@ -208,3 +208,10 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Node
+node_modules
+build
+npm-debug.log
+.env
+.DS_Store
