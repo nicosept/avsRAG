@@ -14,12 +14,16 @@ export function ToastContainer() {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
   useEffect(() => {
-    const subscription = subscribeToListeners(({ message, duration }) => {
-      const id = Date.now() + Math.random();
-      setToasts(prevToasts => [...prevToasts, { id, message}]);
-      setTimeout(() => {
-        setToasts(prevToasts => prevToasts.filter(t => t.id !== id)) 
-      }, duration);
+    const subscription = subscribeToListeners(({ message, duration, id, type }) => {
+      if (type === "show" && message) {
+        setToasts(prevToasts => [...prevToasts, { id, message }]);
+        setTimeout(() => {
+          setToasts(prevToasts => prevToasts.filter(t => t.id !== id))
+        }, duration);
+      }
+      else if (type === "remove") {
+        setToasts(prevToasts => prevToasts.filter(t => t.id !== id));
+      }
     });
     return () => {
       subscription();
@@ -31,10 +35,10 @@ export function ToastContainer() {
       <AnimatePresence>
         {toasts.map(toast => (
           <motion.div
-            layout
+            layout="position"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, x: 300 }} 
+            exit={{ opacity: 0, x: 100 }}
             transition={{ layout: { duration: 0.2, ease: "easeInOut" } }}
             key={toast.id}
             className={"toast"}>

@@ -1,20 +1,32 @@
 import { useState, useRef, useEffect } from "react";
+import { showToast, removeToast } from '../components/ToastBus';
+
 const WS_PORT = import.meta.env.BACK_PORT || 5000;
 const RECONNECT_DELAY = 2000;
 
-const useWebSocket = (onMessage: (event: MessageEvent) => void, debug: boolean = false) => {
-  const [connectionStatus, setConnectionStatus] = useState<boolean>(true);
 
+const useWebSocket = (onMessage: (event: MessageEvent) => void, debug: boolean = false) => {
+
+  const reconnectId = useRef<number | null>(null);
   const reconnectTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const reconnectAttempts = useRef<number>(0);
   const wsRef = useRef<WebSocket | null>(null);
+
+  const onMessageRef = useRef(onMessage);
+  useEffect(() => {
+    onMessageRef.current = onMessage;
+  }, [onMessage]);
 
   const wsConnect = (): void => {
     try {
       wsRef.current = new WebSocket(`ws://localhost:${WS_PORT}/ws/prompt`);
 
       wsRef.current.onopen = () => {
-        setConnectionStatus(true);
+        if (reconnectId.current) {
+          removeToast(reconnectId.current);
+          showToast("✅ Connected", 3000);
+          reconnectId.current = null;
+        }
         reconnectAttempts.current = 0;
         if (reconnectTimeout.current) {
           clearTimeout(reconnectTimeout.current);
@@ -24,16 +36,19 @@ const useWebSocket = (onMessage: (event: MessageEvent) => void, debug: boolean =
       };
 
       wsRef.current.onmessage = (event) => {
-        onMessage(event);
+        onMessageRef.current(event);
       };
 
       wsRef.current.onclose = () => {
-        setConnectionStatus(false);
         if (debug) console.log("WebSocket connection closed.");
 
         if (reconnectAttempts.current < 5) {
           reconnectAttempts.current++;
           if (debug) console.log(`Attempting to reconnect (${reconnectAttempts.current})...`);
+          if (reconnectId.current) {
+            removeToast(reconnectId.current);
+          }
+          reconnectId.current = showToast("🔄 Reconnecting...", 50000);
           reconnectTimeout.current = setTimeout(() => {
             wsConnect();
           }, RECONNECT_DELAY);
@@ -72,7 +87,7 @@ const useWebSocket = (onMessage: (event: MessageEvent) => void, debug: boolean =
     };
   }, []);
 
-  return [connectionStatus, handleSendMessage] as const;
+  return [handleSendMessage] as const;
 };
 
 export default useWebSocket;
