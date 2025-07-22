@@ -1,19 +1,25 @@
 import os
-from fastapi import FastAPI, Request, WebSocket, HTTPException, WebSocketDisconnect
+from fastapi import FastAPI, Request, WebSocket, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import uvicorn
 from dotenv import load_dotenv
-from backend.src.rag import RAG
-import asyncio
-import json
+import logging
+
+from backend.src.prompt_logic import prompt_logic
+from backend.src.document_processor import processor
+from backend.src.vector_store import store
 
 load_dotenv()
 PORT = int(os.environ.get("PORT", 5000))
 FRONT_PORT = int(os.environ.get("FRONT_PORT", 5173))
 
-app = FastAPI()
+# Setup logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
+# Initialize FastAPI app
+app = FastAPI()
 
 @app.exception_handler(404)
 async def not_found_handler(request: Request, exc: HTTPException):
@@ -21,7 +27,6 @@ async def not_found_handler(request: Request, exc: HTTPException):
         status_code=404,
         content={"detail": "The resource you are looking for was not found."},
     )
-
 
 app.add_middleware(
     CORSMiddleware,
@@ -31,58 +36,31 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Currently every upload clears the store, this should be improved.
+# Also, only .txt files are allowed for now.
+
+@app.post("/upload")
+async def upload_file(file: UploadFile):
+    if not store:
+        raise HTTPException(status_code=500, detail="Vector store is not initialized.")
+    logger.info(f"Received file upload: {file.filename}")
+    store.clear_store()
+    if not file.filename.endswith('.txt'):
+        return {"error": "Invalid file type. Only .txt files are allowed."}
+    contents = await file.read()
+    if not contents:
+        return {"error": "File is empty."}
+    docu_processor = processor()
+    processed_document = docu_processor.process_document(contents.decode('utf-8'))
+    document_vectors = docu_processor.embed_texts(processed_document)
+    store.add_vectors(document_vectors)
+    logger.info(f"Processed and stored {len(document_vectors)} vectors from the document.")
+    return {"filename": file.filename}
+
 
 @app.websocket("/ws/prompt")
 async def websocket_prompt(websocket: WebSocket):
-    await websocket.accept()
-    async with RAG(stream=True) as rag:
-        print("WebSocket connection established")
-        query_task = None
-        try:
-            while True:
-                data = await websocket.receive_text()
-                try:
-                    data_json = json.loads(data)
-                except json.JSONDecodeError:
-                    data_json = [data]
-
-                if isinstance(data_json, dict) and data_json.get("type") == "abort":
-                    print("Aborting query")
-                    query_task.cancel()
-                    await websocket.send_json(
-                        {"type": "aborted", "message": "Query aborted"}
-                    )
-                    return
-                
-                # If a query task is already running, cancel it
-                # might want to handle this more gracefully with a queue or running multiple queries
-                if query_task and not query_task.done():
-                    query_task.cancel()
-                
-
-                async def query_send_data(data):
-                    try:
-                        async for chunk in rag.query(data):
-                            if chunk is None:
-                                continue
-                            await websocket.send_json(
-                                {"type": "message", "content": chunk}
-                            )
-                    except asyncio.CancelledError:
-                        print("Query task cancelled")
-                        pass
-
-                query_task = asyncio.create_task(query_send_data(data_json))
-
-        except WebSocketDisconnect:
-            print("WebSocket disconnected")
-        except ConnectionError as e:
-            print(f"Connection error: {str(e)}")
-            await websocket.send_json({"type": "error", "message": str(e)})
-            await websocket.close(code=4000, reason=str(e))
-        except Exception as e:
-            print(f"Unknown error: {str(e)}")
-            await websocket.close(code=1000, reason=str(e))
+    await prompt_logic(websocket)
 
 
 if __name__ == "__main__":
