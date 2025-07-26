@@ -8,7 +8,6 @@ import logging
 
 from backend.src.prompt_logic import prompt_logic
 from backend.src.document_processor import processor
-from backend.src.vector_store import store
 
 load_dotenv()
 PORT = int(os.environ.get("PORT", 5000))
@@ -17,6 +16,9 @@ FRONT_PORT = int(os.environ.get("FRONT_PORT", 5173))
 # Setup logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# Ensure the vector store is initialized TEMP SOLUTION
+from backend.src.vector_store import store
 
 # Initialize FastAPI app
 app = FastAPI()
