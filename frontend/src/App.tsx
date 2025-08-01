@@ -29,6 +29,11 @@ function App() {
       showToast(`❗ ${errorMessage}`, 5000);
       return;
     }
+    if (data.type === "aborted") {
+      const statusMessage = data.message || "Aborted prompt.";
+      showToast(`ℹ️ ${statusMessage}`, 3000);
+      return;
+    }
     if (data.type === "message") {
       const chunk = data.content || "";
       setHistory(prevHistory => {
@@ -71,7 +76,7 @@ function App() {
   return (
     <>
       <ToastContainer />
-      <h1 className='header'>avsUI</h1>
+      <h1 className='header'>🧠🗃️</h1>
       <div className='wrapper'>
         <div className='response-container'>
           <div className='response' style={{ whiteSpace: 'pre-line', textAlign: 'left' }} ref={responseRef}>

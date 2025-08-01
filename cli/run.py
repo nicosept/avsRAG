@@ -27,6 +27,7 @@ def launch():
         [npm_cmd, "run", "dev", "--", "-l", "silent"], cwd=frontend_dir, creationflags=creationflags
     )
 
+    # Implement better shutdown handling, Windows needs special handling
     try:
         backend_proc.wait()
         frontend_proc.wait()

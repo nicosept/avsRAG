@@ -66,5 +66,6 @@ async def websocket_prompt(websocket: WebSocket):
 
 
 if __name__ == "__main__":
-    print(f"Running backend on port {PORT}, frontend on port {FRONT_PORT}")
+    print(f"Running backend on port {PORT}")
+    print(f"Current frontend URL: http://localhost:{FRONT_PORT}")
     uvicorn.run("main:app", port=PORT, host="127.0.0.1", reload=True, log_level="error")

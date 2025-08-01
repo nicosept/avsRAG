@@ -1,7 +1,9 @@
-# avsRAG 🧠🗃️
+# avsRAG (🚧🏗️)
 
-(a very simple)RAG is a locally hosted LLM interface that integrates a Retrieval-Augmented Generation pipeline to improve the relevance of responses using user-provided documents. Designed with data privacy in mind, it enables offline use of open-weight language models for tasks like tech research, document reviews, or other data sensitive professional applications. <br>
+🧠🗃️ (a very simple)RAG is a locally hosted LLM interface that integrates a Retrieval-Augmented Generation pipeline to improve the relevance of responses using user-provided documents. Designed with data privacy in mind, it enables offline use of open-weight language models for tasks like tech research, document reviews, or other data sensitive professional applications. <br>
+<br>
 The system retrieves contextual data using an embedding model and performs similarity searches through a vector store (with plans to integrate PostgreSQL). This allows the LLM to generate grounded responses from custom and proprietary data.<br>
+<br>
 The frontend is built with React and Vite for a fast and lightweight user experience, while the backend runs on FastAPI with Uvicorn, supporting real-time, asynchronous communication over WebSockets.
 
 <img src="system_diagram.png" alt="avsRAG Logo"/>
@@ -10,15 +12,18 @@ The frontend is built with React and Vite for a fast and lightweight user experi
 - **Language Model**: Integrates with ollama's language models for generating responses.
 - **Simple Interface**: Provides a straightforward interface for querying and retrieving information.
 - **Document Management**: Allows for adding and managing documents in the vector database.
-- **Vector Database**: [ ! ] Currently working on implementing Postgres pgvector support.
+- **Vector Database**: [ ! ] Working on implementing Postgres pgvector support.
 
 # To-Do
 - [x] Implement Ollama language model support.
-- [x] Implement simple query interface.
-- [ ] Implement simple vector database interface.
-- [ ] Implement simple document upload interface.
-- [ ] Implement simple document management.
+- [x] Implement query chat interface.
+- [x] Implement simple vector store.
+- [ ] Implement document upload UI.
+- [ ] Implement vector database interface.
 - [ ] Implement Postgres pgvector support.
+- [ ] Implement document management.
+
+As of right now, the system is fully functional with any Ollama language model through a simple vector store. The document upload web UI and vector database interface with Postgres are in progress, so document upload is currently done through direct API calls.
 
 ## 🚀 Quickstart
 
@@ -57,5 +62,5 @@ The frontend is built with React and Vite for a fast and lightweight user experi
 
 
 ## Future Work
-- **Multiple LLM API support**: Add support for more language models starting with OpenAI.
+- **Multiple LLM API support**: Add support for more language model providers, starting with OpenAI.
 - **Multiple Vector Database support**: Implement support for multiple vector databases.
