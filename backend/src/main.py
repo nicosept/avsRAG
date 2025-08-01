@@ -41,7 +41,7 @@ app.add_middleware(
 # Currently every upload clears the store, this should be improved.
 # Also, only .txt files are allowed for now.
 
-@app.post("/upload")
+@app.post("/api/upload")
 async def upload_file(file: UploadFile):
     if not store:
         raise HTTPException(status_code=500, detail="Vector store is not initialized.")
@@ -57,7 +57,7 @@ async def upload_file(file: UploadFile):
     document_vectors = docu_processor.embed_texts(processed_document)
     store.add_vectors(document_vectors)
     logger.info(f"Processed and stored {len(document_vectors)} vectors from the document.")
-    return {"filename": file.filename}
+    return {"message": "File processed and vectors stored successfully."}
 
 
 @app.websocket("/ws/prompt")

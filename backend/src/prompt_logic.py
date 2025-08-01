@@ -67,8 +67,6 @@ async def query_send_data(data, rag: RAG, websocket: WebSocket, doc_processor: p
             logger.info("Processing prompt")
             vector_prompt = doc_processor.embed_prompt(data)
             results = store.search_vectors(vector_prompt)
-            print(results)
-            print(type(results))
             context = "\n".join(results) if results else None
             rag.set_context(context)
 

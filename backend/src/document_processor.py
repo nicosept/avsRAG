@@ -27,7 +27,6 @@ class processor:
         vectors = {}
         result = ollama.embed(model=self.embedding_model, input=texts)
         embeddings = result.get("embeddings", [])
-        print(type(embeddings))
         for text, vector in zip(texts, embeddings):
             if vector is None:
                 logger.error(f"Failed to embed text: {text}")
