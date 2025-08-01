@@ -1,7 +1,6 @@
 # avsRAG (🚧🏗️)
 
 🧠🗃️ (a very simple)RAG is a locally hosted LLM interface that integrates a Retrieval-Augmented Generation pipeline to improve the relevance of responses using user-provided documents. Designed with data privacy in mind, it enables offline use of open-weight language models for tasks like tech research, document reviews, or other data sensitive professional applications. <br>
-<br>
 The system retrieves contextual data using an embedding model and performs similarity searches through a vector store (with plans to integrate PostgreSQL). This allows the LLM to generate grounded responses from custom and proprietary data.<br>
 <br>
 The frontend is built with React and Vite for a fast and lightweight user experience, while the backend runs on FastAPI with Uvicorn, supporting real-time, asynchronous communication over WebSockets.
@@ -22,6 +21,7 @@ The frontend is built with React and Vite for a fast and lightweight user experi
 - [ ] Implement vector database interface.
 - [ ] Implement Postgres pgvector support.
 - [ ] Implement document management.
+- [ ] Clean up and push test cases.
 
 As of right now, the system is fully functional with any Ollama language model through a simple vector store. The document upload web UI and vector database interface with Postgres are in progress, so document upload is currently done through direct API calls.
 

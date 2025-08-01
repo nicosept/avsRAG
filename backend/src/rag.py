@@ -40,7 +40,6 @@ class RAG:
         self.stream = stream
         self.history: List[Dict[str, str]] = []
         self._client: Optional[ollama.AsyncClient] = None
-        logger.info(f"Initialized RAG with model: {self.model}, hosted at {self.model_url}")
         
 
     @property
@@ -48,6 +47,7 @@ class RAG:
         """Initialization of the Ollama client."""
         if self._client is None:
             self._client = ollama.AsyncClient(host=self.model_url)
+        logger.info(f"Initialized RAG with model: {self.model}, hosted at {self.model_url}")
         return self._client
 
     async def close(self) -> None:
@@ -86,7 +86,7 @@ class RAG:
             raise ValueError("Prompt cannot be empty.")
         prompt = self._prepare_prompt(prompt)
         self.history.append({"role": USER_ROLE, "content": prompt})
-
+        print(self.history)
         try:
             response = await self.client.chat(
                 model=self.model,
@@ -114,13 +114,10 @@ class RAG:
 
         # Custom exception classes for the RAG needed
         except ollama.ResponseError as e:
-            logger.error(f"Ollama response error: {e}")
             raise RuntimeError(f"Error querying Ollama: {e.message}")
         except httpx.ConnectError as e:
-            logger.error(f"Connection error: {e}")
-            raise ConnectionError(f"Connection attempt failed. Please check your Ollama server {self.model_url}.")
+            raise ConnectionError(f"Please check your Ollama server {self.model_url}.")
         except Exception as e:
-            logger.error(f"Unexpected error querying Ollama: {str(e)}")
             raise RuntimeError(f"Unexpected error querying Ollama: {str(e)}")
 
     async def __aenter__(self) -> 'RAG':
