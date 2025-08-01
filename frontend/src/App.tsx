@@ -3,7 +3,9 @@ import useWebSocket from './hooks/useWebSocket'
 import ReactMarkdown from 'react-markdown'
 
 import { showToast, ToastContainer } from './components/Toast'
+import { FileUpload } from './FileUpload'
 import './App.css'
+
 
 const USER_ROLE = import.meta.env.USER_ROLE || "user";
 const ASSISTANT_ROLE = import.meta.env.ASSISTANT_ROLE || "model"; // Gemma 3 uses "model" as the assistant role
@@ -117,6 +119,9 @@ function App() {
           <button onClick={wsPrompt} disabled={!prompt}>
             🪄
           </button>
+        </div>
+        <div className='file-upload'>
+          <FileUpload />
         </div>
       </div>
     </>
