@@ -54,7 +54,7 @@ class RAG:
         """Close the Ollama client connection."""
         if self._client:
             try:
-                await self.client.aclose()
+                await self.client._client.aclose()
                 logger.debug("Ollama client closed successfully.")
             except Exception as e:
                 logger.error(f"Error closing Ollama client: {e}")

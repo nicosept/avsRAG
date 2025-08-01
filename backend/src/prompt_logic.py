@@ -57,10 +57,6 @@ async def prompt_logic(websocket: WebSocket):
 
         except WebSocketDisconnect:
             logger.info("WebSocket disconnected")
-        except ConnectionError as e:
-            logger.error(f"Connection error: {str(e)}")
-            await websocket.send_json({"type": "error", "message": str(e)})
-            await websocket.close(code=4000, reason=str(e))
         except Exception as e:
             logger.error(f"Unknown error: {str(e)}")
             await websocket.close(code=1000, reason=str(e))
@@ -84,3 +80,8 @@ async def query_send_data(data, rag: RAG, websocket: WebSocket, doc_processor: p
             )
     except asyncio.CancelledError:
         logger.info("Query task cancelled")
+    except ConnectionError as e:
+        logger.error(f"Connection error: {str(e)}")
+        await websocket.send_json({"type": "error", "message": str(e)})
+        await websocket.close(code=4000, reason=str(e))
+        return
