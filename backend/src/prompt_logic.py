@@ -83,5 +83,8 @@ async def query_send_data(data, rag: RAG, websocket: WebSocket, doc_processor: p
     except ConnectionError as e:
         logger.error(f"Connection error: {str(e)}")
         await websocket.send_json({"type": "error", "message": str(e)})
-        await websocket.close(code=4000, reason=str(e))
+        return
+    except Exception as e:
+        logger.error(f"Error during query: {str(e)}")
+        await websocket.send_json({"type": "error", "message": str(e)})
         return
