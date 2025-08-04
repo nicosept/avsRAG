@@ -45,6 +45,3 @@ class vector_store:
         return dot_product / (norm_a * norm_b)
     
 
-# Temporary store instance for the application
-# This should be replaced with a proper vector store implementation.
-store = vector_store()
