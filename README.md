@@ -63,4 +63,5 @@ As of right now, the system is fully functional with any Ollama language model t
 
 ## Future Work
 - **Multiple LLM API support**: Add support for more language model providers, starting with OpenAI.
+- **Multi-User Support**: Implement user authentication and session management for a single server with multiple user architecture.
 - **Multiple Vector Database support**: Implement support for multiple vector databases.
