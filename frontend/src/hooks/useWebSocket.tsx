@@ -19,7 +19,7 @@ const useWebSocket = (onMessage: (event: MessageEvent) => void, debug: boolean =
 
   const wsConnect = (): void => {
     try {
-      wsRef.current = new WebSocket(`ws://localhost:${WS_PORT}/ws/prompt`);
+      wsRef.current = new WebSocket(`ws://localhost:${WS_PORT}/api/prompt/`);
 
       wsRef.current.onopen = () => {
         if (reconnectId.current) {
